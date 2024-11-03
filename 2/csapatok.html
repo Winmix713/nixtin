@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="hu" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Csapat Statisztikák - Winmix.hu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --pl-purple: #37003c;
+            --pl-pink: #ff2882;
+            --pl-turquoise: #00ff85;
+            --pl-lila: #A020F0;
+            --match-bg: white;
+        }
+
+        body {
+            background-color: var(--pl-purple);
+            background-image:
+                linear-gradient(45deg, rgba(255, 40, 130, 0.1) 0%, transparent 70%),
+                linear-gradient(-45deg, rgba(0, 255, 133, 0.1) 0%, transparent 70%);
+            color: #fff;
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .select-custom {
+            appearance: none;
+            padding-right: 2.5rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1.5em 1.5em;
+            display: block;
+            width: 100%;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .select-custom option {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: black;
+        }
+
+        .query-button {
+            background-color: var(--pl-lila);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .query-button:hover {
+            background-color: #6A0DAD;
+        }
+
+        .radio-option {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .radio-option input {
+            margin-right: 0.5rem;
+        }
+
+        .team-logo {
+            width: 34px;
+            height: 34px;
+        }
+
+        .results-table {
+            background-color: white;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .match-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.3s ease;
+        }
+
+        .match-row:last-child {
+            border-bottom: none;
+        }
+
+        .team-name {
+            font-size: 12px;
+            font-weight: bold;
+            color: #370081;
+            flex: 1;
+            text-align: center;
+        }
+
+        .score-box {
+            background-color: #4B0082;
+            color: white;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 8px;
+            margin: 0 10px;
+        }
+
+        @media (max-width: 600px) {
+            .score-box {
+                font-size: 16px;
+            }
+        }
+
+        #team-logo {
+            width: 68px;
+            height: 68px;
+        }
+
+        .match-row:hover {
+            background-color: var(--match-bg);
+            color: black;
+        }
+
+        .match-row:hover .team-name {
+            color: black;
+        }
+
+        .statistical-results {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="h-full">
+    <nav class="relative z-10 border-b border-white/10">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <img class="h-8" src="http://www.winmix.hu/logo.png" alt="Winmix">
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="index.html" class="text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium">Előrejelzések</a>
+                            <a href="csapatok.html" class="bg-[#ff2882] px-3 py-2 rounded-md text-sm font-medium">Csapatok</a>
+                            <a href="h2h.html" class="text-white hover:bg-white/10 px-3 py-2 rounded-md text-sm font-medium">H2H</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="relative z-10 py-10">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="content-card p-8">
+                <h1 class="text-4xl font-bold text-center mb-8">Csapat Statisztikák</h1>
+
+                <div class="grid grid-cols-1 gap-8 mb-8 justify-center items-center text-center">
+                    <div class="w-full md:w-1/2 mx-auto">
+                        <label for="team" class="block text-sm font-medium mb-2">Válassz csapatot</label>
+                        <select id="team" class="w-full select-custom">
+                            <option value="">Válassz csapatot</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="radio-option">
+                    <label>
+                        <input type="radio" name="match-type" value="home" checked> Hazai mérkőzések
+                    </label>
+                    <label style="margin-left: 1rem;">
+                        <input type="radio" name="match-type" value="away"> Vendég mérkőzések
+                    </label>
+                    <label style="margin-left: 1rem;">
+                        <input type="radio" name="match-type" value="all"> Összes mérkőzés
+                    </label>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <button id="query-button" class="query-button w-full md:w-1/2 mx-auto">Lekérdezés</button>
+                </div>
+
+                <div id="team-stats" class="hidden mt-8">
+                    <div class="text-center mb-12">
+                        <img id="team-logo" src="" alt="Team logo" class="team-logo mx-auto mb-4">
+                        <h2 id="team-name" class="text-3xl font-bold"></h2>
+                        <p id="stats-display" class="text-lg text-gray-300 mb-4"></p>
+                    </div>
+                    <div id="statistical-results" class="statistical-results"></div>
+                    <div id="matches-list" class="results-table"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let teams = {
+            "Vörös Ördögök": "https://resources.premierleague.com/premierleague/badges/50/t1.png",
+            "Chelsea": "https://resources.premierleague.com/premierleague/badges/50/t8.png",
+            "Liverpool": "https://resources.premierleague.com/premierleague/badges/50/t14.png",
+            "Manchester Kék": "https://resources.premierleague.com/premierleague/badges/50/t43.png",
+            "Everton": "https://resources.premierleague.com/premierleague/badges/50/t11.png",
+            "Brentford": "https://resources.premierleague.com/premierleague/badges/50/t94.png",
+            "Crystal Palace": "https://resources.premierleague.com/premierleague/badges/50/t31.png",
+            "Fulham": "https://resources.premierleague.com/premierleague/badges/50/t54.png",
+            "Wolverhampton": "https://resources.premierleague.com/premierleague/badges/50/t39.png",
+            "London Ágyúk": "https://resources.premierleague.com/premierleague/badges/50/t3.png",
+            "Brighton": "https://resources.premierleague.com/premierleague/badges/50/t36.png",
+            "Nottingham": "https://resources.premierleague.com/premierleague/badges/50/t17.png",
+            "Tottenham": "https://resources.premierleague.com/premierleague/badges/50/t6.png",
+            "Newcastle": "https://resources.premierleague.com/premierleague/badges/50/t4.png",
+            "West Ham": "https://resources.premierleague.com/premierleague/badges/50/t21.png",
+            "Aston Oroszlán": "https://resources.premierleague.com/premierleague/badges/50/t7.png"
+        };
+
+        function populateTeamSelect() {
+            const select = document.getElementById('team');
+            Object.keys(teams).forEach(team => {
+                const option = document.createElement('option');
+                option.value = team;
+                option.textContent = team;
+                select.appendChild(option);
+            });
+        }
+
+        async function fetchTeamStats(team, matchType) {
+            let url = 'https://winmix.hu/api/combined_matches_api.php?';
+
+            if (matchType === 'home') {
+                url += 'home_team=' + encodeURIComponent(team);
+            } else if (matchType === 'away') {
+                url += 'away_team=' + encodeURIComponent(team);
+            } else {
+                url += 'team=' + encodeURIComponent(team);
+            }
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                // Display team stats after fetching data
+                displayTeamStats(team, data);
+                // Calculate and display statistical results
+                displayStatisticalResults(team, data, matchType);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function displayTeamStats(team, data) {
+            const teamStatsDiv = document.getElementById('team-stats');
+            document.getElementById('team-name').textContent = team;
+            document.getElementById('team-logo').src = teams[team];
+            document.getElementById('stats-display').textContent = `${data.length} mérkőzés található`;
+
+            const matchesListDiv = document.getElementById('matches-list');
+            matchesListDiv.innerHTML = '';
+
+            data.forEach(match => {
+                const matchRow = document.createElement('div');
+                matchRow.classList.add('match-row');
+                matchRow.innerHTML = `
+                    <div class="team-name">${match.home_team}</div>
+                    <img src="${teams[match.home_team]}" alt="${match.home_team} logo" class="team-logo">
+                    <div class="score-box">${match.score.home} - ${match.score.away}</div>
+                    <img src="${teams[match.away_team]}" alt="${match.away_team} logo" class="team-logo">
+                    <div class="team-name">${match.away_team}</div>
+                `;
+                matchesListDiv.appendChild(matchRow);
+            });
+
+            teamStatsDiv.classList.remove('hidden');
+        }
+
+        async function displayStatisticalResults(team, data, matchType) {
+            const statisticalResultsDiv = document.getElementById('statistical-results');
+            let wins = 0, draws = 0, losses = 0, homeGoals = 0, awayGoals = 0, bothTeamsScored = 0;
+            const bothTeamsScoredMatches = {};
+            const noBothTeamsScoredMatches = {};
+
+            data.forEach(match => {
+                if (match.home_team === team) {
+                    homeGoals += match.score.home;
+                    if (match.score.home > match.score.away) wins++;
+                    else if (match.score.home === match.score.away) draws++;
+                    else losses++;
+
+                    if (match.score.home > 0 && match.score.away > 0) {
+                        bothTeamsScored++;
+                        bothTeamsScoredMatches[match.away_team] = (bothTeamsScoredMatches[match.away_team] || 0) + 1;
+                    } else {
+                        noBothTeamsScoredMatches[match.away_team] = (noBothTeamsScoredMatches[match.away_team] || 0) + 1;
+                    }
+                } else if (match.away_team === team) {
+                    awayGoals += match.score.away;
+                    if (match.score.away > match.score.home) wins++;
+                    else if (match.score.away === match.score.home) draws++;
+                    else losses++;
+
+                    if (match.score.home > 0 && match.score.away > 0) {
+                        bothTeamsScored++;
+                        bothTeamsScoredMatches[match.home_team] = (bothTeamsScoredMatches[match.home_team] || 0) + 1;
+                    } else {
+                        noBothTeamsScoredMatches[match.home_team] = (noBothTeamsScoredMatches[match.home_team] || 0) + 1;
+                    }
+                }
+            });
+
+            const totalMatches = data.length;
+            const homeMatches = data.filter(match => match.home_team === team).length;
+            const awayMatches = data.filter(match => match.away_team === team).length;
+            const homeGoalAvg = homeMatches ? (homeGoals / homeMatches).toFixed(2) : 0;
+            const awayGoalAvg = awayMatches ? (awayGoals / awayMatches).toFixed(2) : 0;
+            const totalGoals = homeGoals + awayGoals;
+            const totalGoalAvg = totalMatches ? (totalGoals / totalMatches).toFixed(2) : 0;
+            const bothTeamsScoredPct = totalMatches ? ((bothTeamsScored / totalMatches) * 100).toFixed(2) : 0;
+
+            let resultHtml = `
+                <p>Győzelmek száma: ${wins}</p>
+                <p>Döntetlenek száma: ${draws}</p>
+                <p>Vereségek száma: ${losses}</p>
+                ${matchType !== 'away' ? `<p>Hazai mérkőzés gól átlaga: ${homeGoalAvg}</p>` : ''}
+                ${matchType !== 'home' ? `<p>Vendég mérkőzés gól átlaga: ${awayGoalAvg}</p>` : ''}
+                ${matchType === 'all' ? `<p>Összes mérkőzés gól átlaga: ${totalGoalAvg}</p>` : ''}
+                <p>Összes mérkőzésből hány mérkőzésen szerzett mind a két csapat gólt: ${bothTeamsScoredPct}%</p>
+            `;
+
+            if (matchType === 'all') {
+                const topBothTeamsScored = Object.entries(bothTeamsScoredMatches)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 3)
+                    .map(entry => entry[0])
+                    .join(', ');
+
+                const topNoBothTeamsScored = Object.entries(noBothTeamsScoredMatches)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 3)
+                    .map(entry => entry[0])
+                    .join(', ');
+
+                resultHtml += `
+                    <p>Legtöbbször mindkét csapat szerzett gólt: ${topBothTeamsScored}</p>
+                    <p>Legtöbbször egyik csapat sem szerzett gólt: ${topNoBothTeamsScored}</p>
+                `;
+            }
+
+            statisticalResultsDiv.innerHTML = resultHtml;
+        }
+
+        document.getElementById('query-button').addEventListener('click', () => {
+            const team = document.getElementById('team').value;
+            const matchType = document.querySelector('input[name="match-type"]:checked').value;
+
+            if (team) {
+                fetchTeamStats(team, matchType);
+            } else {
+                alert('Kérlek, válassz egy csapatot!');
+            }
+        });
+
+        populateTeamSelect();
+    </script>
+</body>
+
+</html>
